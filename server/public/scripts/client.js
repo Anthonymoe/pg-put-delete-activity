@@ -9,6 +9,7 @@ function addClickHandlers() {
 
   // TODO - Add code for edit & delete buttons
   $('#bookShelf').on('click', '.deleteButton', deleteBook);
+  $('#bookShelf').on('click', '.readButton', readBook);
 }
 
 function handleSubmit() {
@@ -54,13 +55,17 @@ function renderBooks(books) {
 
   for(let i = 0; i < books.length; i += 1) {
     let book = books[i];
+    let readHTML = `<button data-id="${ book.id }" class="readButton">Read</button>`;
+    if( book.isRead ){
+      readHTML = "Read";
+    }
     // For each book, append a new row to our table
     $('#bookShelf').append(`
       <tr>
         <td>${book.title}</td>
         <td>${book.author}</td>
         <td><button data-id=${book.id} class="deleteButton">Delete</button></td>
-        <td><button data-id=${book.id} class="readButton">Mark as read</button></td>
+        <td>${readHTML}</td>
       </tr>
     `);
   }
@@ -75,6 +80,22 @@ function deleteBook (){
     url: '/books/' + myId
   }).then( function(response){
     console.log( 'back from delete with:', response );
+    refreshBooks();
+  }).catch( function(err){
+    console.log( err );
+    alert( 'nope' );
+  })
+}//end deleteBook
+
+function readBook (){
+  const myId = $(this).data( 'id' );
+  console.log( 'in readBook', myId );
+  //ajax call of type DELETE to update db
+  $.ajax({
+    method: 'PUT',
+    url: '/books/' + myId
+  }).then( function(response){
+    console.log( 'back from PUT:', response );
     refreshBooks();
   }).catch( function(err){
     console.log( err );
